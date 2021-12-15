@@ -152,5 +152,5 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
-**appsettings.Production.json
+**appsettings.Development.json
 **config.js
