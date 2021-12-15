@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Travel.Application.Common.Interfaces;
 using Travel.Domain.Entities;
+using Travel.Domain.Enums;
 
 namespace Travel.Application.TourPackages.Commands.CreateTourPackage
 {

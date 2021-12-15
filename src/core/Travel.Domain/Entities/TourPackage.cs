@@ -1,3 +1,5 @@
+using Travel.Domain.Enums;
+
 namespace Travel.Domain.Entities
 {
     public class TourPackage
