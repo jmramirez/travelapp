@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Travel.Application.Common.Mapping;
+using Travel.Application.Common.Mappings;
 using Travel.Domain.Entities;
 
 namespace Travel.Application.Dtos
 {
-    public class TourListDto : ImapFrom<TourList>
+    public class TourListDto : IMapFrom<TourList>
     {
         public TourListDto()
         {

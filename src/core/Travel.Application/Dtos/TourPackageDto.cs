@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
-using Travel.Application.Common.Mapping;
+using Travel.Application.Common.Mappings;
 using Travel.Domain.Entities;
 
 namespace Travel.Application.Dtos
 {
-    public class TourPackageDto : ImapFrom<TourPackage>
+    public class TourPackageDto : IMapFrom<TourPackage>
     {
         public int Id { get; set; }
         public int ListId { get; set; }

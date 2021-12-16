@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Travel.Application.Common.Mapping
+namespace Travel.Application.Common.Mappings
 {
     public class MappingProfile : Profile
     {
@@ -17,7 +17,7 @@ namespace Travel.Application.Common.Mapping
         private void ApplyMappingsFromAssembly(Assembly assembly)
         {
             var types = assembly.GetExportedTypes()
-                .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ImapFrom<>))).ToList();
+                .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMapFrom<>))).ToList();
 
             foreach (var type in types)
             {
