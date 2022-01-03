@@ -2,83 +2,87 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Travel.Application.Common.Exceptions;
 
-namespace Travel.WebApi.Filters;
-
-public class ApiExceptionFilter : ExceptionFilterAttribute
+namespace Travel.WebApi.Filters
 {
-    private readonly IDictionary<Type, Action<ExceptionContext>> _exceptionHandlers;
-
-    public ApiExceptionFilter()
+    public class ApiExceptionFilter : ExceptionFilterAttribute
     {
-        _exceptionHandlers = new Dictionary<Type, Action<ExceptionContext>>
+
+        private readonly IDictionary<Type, Action<ExceptionContext>> _exceptionHandlers;
+
+        public ApiExceptionFilter()
         {
-            {typeof(ValidationException), HandleValidationException},
-            {typeof(NotFoundException), HandleNotFoundException}
-        };
-    }
-
-    public override void OnException(ExceptionContext context)
-    {
-        HandleException(context);
-        base.OnException(context);
-    }
-
-    private void HandleException(ExceptionContext context)
-    {
-        Type type = context.Exception.GetType();
-        if (_exceptionHandlers.ContainsKey(type))
-        {
-            _exceptionHandlers[type].Invoke(context);
-            return;
+            // Register known exception types and handlers.
+            _exceptionHandlers = new Dictionary<Type, Action<ExceptionContext>>
+            {
+                { typeof(ValidationException), HandleValidationException },
+                { typeof(NotFoundException), HandleNotFoundException },
+            };
         }
-        
-        HandleUnknownException(context);
-    }
-    
-    private void HandleUnknownException(ExceptionContext context)
-    {
-        var details = new ProblemDetails
+
+        public override void OnException(ExceptionContext context)
         {
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-            Title = "An error occurred while processing your request",
-            Status = StatusCodes.Status500InternalServerError
-        };
+            HandleException(context);
 
-        context.Result = new ObjectResult(details)
+            base.OnException(context);
+        }
+
+        private void HandleException(ExceptionContext context)
         {
-            StatusCode = StatusCodes.Status500InternalServerError
-        };
+            Type type = context.Exception.GetType();
+            if (_exceptionHandlers.ContainsKey(type))
+            {
+                _exceptionHandlers[type].Invoke(context);
+                return;
+            }
 
-        context.ExceptionHandled = true;
-    }
-    
-    private void HandleValidationException(ExceptionContext context)
-    {
-        var exception = context.Exception as ValidationException;
+            HandleUnknownException(context);
+        }
 
-        var details = new ValidationProblemDetails(exception.Errors)
+        private void HandleUnknownException(ExceptionContext context)
         {
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
-        };
+            var details = new ProblemDetails
+            {
+                Status = StatusCodes.Status500InternalServerError,
+                Title = "An error occurred while processing your request.",
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1"
+            };
 
-        context.Result = new BadRequestObjectResult(details);
+            context.Result = new ObjectResult(details)
+            {
+                StatusCode = StatusCodes.Status500InternalServerError
+            };
 
-        context.ExceptionHandled = true;
-    }
+            context.ExceptionHandled = true;
+        }
 
-    private void HandleNotFoundException(ExceptionContext context)
-    {
-        var exception = context.Exception as NotFoundException;
-
-        var details = new ProblemDetails()
+        private void HandleValidationException(ExceptionContext context)
         {
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
-            Title = "The specified resource was not found",
-            Detail = exception.Message
-        };
+            var exception = (ValidationException)context.Exception;
 
-        context.Result = new NotFoundObjectResult(details);
+            var details = new ValidationProblemDetails(exception.Errors)
+            {
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+            };
 
-        context.ExceptionHandled = true;
+            context.Result = new BadRequestObjectResult(details);
+
+            context.ExceptionHandled = true;
+        }
+
+        private void HandleNotFoundException(ExceptionContext context)
+        {
+            var exception = context.Exception as NotFoundException;
+
+            var details = new ProblemDetails()
+            {
+                Type = "https://tools.ietf.org/html/rfc7231#section-6.5.4",
+                Title = "The specified resource was not found.",
+                Detail = exception.Message
+            };
+
+            context.Result = new NotFoundObjectResult(details);
+
+            context.ExceptionHandled = true;
+        }
     }
 }
